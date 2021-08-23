@@ -8,11 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @Slf4j
@@ -29,7 +31,7 @@ public class MemberController {
     }
 
     @PostMapping("/members/new")
-    public String finishFrom(@Valid MemberForm memberForm, BindingResult bindingResult) {
+    public String finishForm(@Valid MemberForm memberForm, BindingResult bindingResult) {
         if(bindingResult.hasErrors()){
            return "members/createMemberForm";
         }
@@ -37,8 +39,20 @@ public class MemberController {
         member.setName(memberForm.getName());
         member.setAddress(new Address(memberForm.getCity(), memberForm.getStreet(), memberForm.getZipcode()));
 
-        memberService.join(member);
+        try {
+            memberService.join(member);
+        } catch (IllegalStateException e){
+            bindingResult.addError(new FieldError("memberForm", "name", "이미 존재하는 이름입니다."));
+            return "members/createMemberForm";
+        }
         return "redirect:/";
+    }
+
+    @GetMapping("/members")
+    public String findMembers(Model model){
+        List<Member> members = memberService.findMembers();
+        model.addAttribute("members", members);
+        return "members/memberList";
     }
 
 }
