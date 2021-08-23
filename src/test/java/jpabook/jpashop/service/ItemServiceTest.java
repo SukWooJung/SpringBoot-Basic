@@ -20,8 +20,6 @@ class ItemServiceTest {
     ItemRepository itemRepository;
     @Autowired
     ItemService itemService;
-    @Autowired
-    EntityManager em;
 
     @Test
     @Rollback(value = false)
@@ -38,39 +36,4 @@ class ItemServiceTest {
         assertEquals(book, itemRepository.findOne(book.getId()));
     }
 
-    @Test
-    @Transactional
-    @Rollback(value = false)
-    public void 아이템_재고_증가() throws Exception {
-        // given
-        Book book = new Book();
-        book.setName("정보처리기사 1급 실기1");
-        book.setPrice(10000);
-        book.setStockQuantity(100);
-        itemService.saveItem(book);
-
-        // when
-        itemService.addQuantity(book.getId(), 50);
-
-        // then
-        assertEquals(book.getStockQuantity(), itemRepository.findOne(book.getId()).getStockQuantity());
-    }
-
-    @Test
-    @Transactional
-    @Rollback(value = false)
-    public void 아이템_재고_감소() throws Exception {
-        // given
-        Book book = new Book();
-        book.setName("정보처리기사 1급 실기2");
-        book.setPrice(10000);
-        book.setStockQuantity(100);
-        itemService.saveItem(book);
-
-        // when
-        itemService.minusQuantity(book.getId(), 50);
-
-        // then
-        assertEquals(book.getStockQuantity(), itemRepository.findOne(book.getId()).getStockQuantity());
-    }
 }

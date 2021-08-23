@@ -35,15 +35,4 @@ public class ItemRepository {
         return findItem;
     }
 
-    // 재고 증가
-    public void addQuantity(Long id, int plusQuantity){
-        Item find = findOne(id);
-        find.addStock(plusQuantity);
-    }
-    // 재고 감소
-    public void minusQuantity(Long id, int minusQuantity){
-        Item find = findOne(id);
-        find.removeStock(minusQuantity);
-    }
-
 }
