@@ -1,6 +1,7 @@
 package jpabook.jpashop.repository;
 
 import jpabook.jpashop.domain.Item;
+import jpabook.jpashop.domain.form.BookForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -16,8 +17,6 @@ public class ItemRepository {
     public Long save(Item item) {
         if(item.getId() == null){
             em.persist(item);
-        } else {
-            em.merge(item);
         }
         return item.getId();
     }
