@@ -49,8 +49,12 @@ public class OrderService {
         order.cancelOrder();
     }
 
+    public Order findOne(Long orderId){
+        return orderRepository.findOne(orderId);
+    }
+
     @Transactional(readOnly = true)
     public List<Order> findOrders(OrderSearch orderSearch){
-        return orderRepository.findAll(orderSearch);
+        return orderRepository.findAllByCriteria(orderSearch);
     }
 }

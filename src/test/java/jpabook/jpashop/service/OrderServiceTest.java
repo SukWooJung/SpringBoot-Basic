@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -87,6 +89,34 @@ class OrderServiceTest {
         Order order = orderRepository.findOne(orderId);
         assertEquals(item.getStockQuantity(), 100, "주문이 취소되면 재고는 원래 개수대로 돌아와야 한다.");
         assertEquals(order.getStatus(), OrderStatus.CANCEL, "주문이 취소되면 주문 상태는 CANCEL 이어야 한다.");
+    }
+
+    @Test
+    @Transactional
+    @Rollback(value = false)
+    public void 주문내역_조회() throws Exception {
+        // given
+        Member member = createMember();
+        Item item = createItem(10000, 100, "나태주");
+
+        // when
+        int count = 10;
+        Long orderId = 0L;
+        try {
+            orderId = orderService.order(member.getId(), item.getId(), count);
+        } catch (NotEnoughStockException e) {
+            return;
+        }
+        // when
+        OrderSearch orderSearch = new OrderSearch();
+        orderSearch.setOrderStatus(OrderStatus.ORDER);
+        orderSearch.setMemberName("정석우");
+
+        List<Order> orders = orderService.findOrders(orderSearch);
+
+        // then
+        assertEquals(orders.size(), 1, "주문을 하나 했으니 주문내역 조회했을 때 주문개수도 1");
+        assertEquals(orders.get(0), orderRepository.findOne(orderId), "하나의 주문내역의 객체는 일치");
     }
 
     private Item createItem(int price, int stockQuantity, String author) {
